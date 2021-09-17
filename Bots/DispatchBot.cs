@@ -235,7 +235,7 @@ namespace Microsoft.BotBuilderSamples
             var heroCard = new HeroCard
             {
                 // title of the card
-                Title = "Suthahar Jegatheesan",
+                Title = "Md Farid Uddin Kiron",
                 //subtitle of the card
                 Subtitle = "Microsoft certified solution developer",
                 // navigate to page , while tab on card
@@ -246,7 +246,7 @@ namespace Microsoft.BotBuilderSamples
                 // list of  Large Image
                 Images = new List<CardImage> { new CardImage("http://csharpcorner.mindcrackerinc.netdna-cdn.com/UploadFile/AuthorImage/jssuthahar20170821011237.jpg") },
                 // list of buttons 
-                Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl, "Learn More", value: "http://www.devenvexe.com"), new CardAction(ActionTypes.OpenUrl, "C# Corner", value: "http://www.c-sharpcorner.com/members/suthahar-j"), new CardAction(ActionTypes.OpenUrl, "MSDN", value: "https://social.msdn.microsoft.com/profile/j%20suthahar/") }
+                Buttons = new List<CardAction> { new CardAction(ActionTypes.OpenUrl, "Learn More", value: "https://stackoverflow.com/users/9663070/md-farid-uddin-kiron"), new CardAction(ActionTypes.OpenUrl, "C# Corner", value: "https://stackoverflow.com/users/9663070/md-farid-uddin-kiron"), new CardAction(ActionTypes.OpenUrl, "MSDN", value: "https://stackoverflow.com/users/9663070/md-farid-uddin-kiron") }
             };
 
             return heroCard.ToAttachment();
@@ -260,18 +260,18 @@ namespace Microsoft.BotBuilderSamples
                 var heroCard = new HeroCard
                 {
                     // title of the card
-                    Title = "Suthahar Jegatheesan",
+                    Title = "Md Farid Uddin Kiron",
                     //subtitle of the card
                     Subtitle = "Microsoft certified solution developer",
                     // navigate to page , while tab on card
                     // Tap = new CardAction(ActionTypes.OpenUrl, "Learn More", value: "Learn More"),
                     Tap = new CardAction("", "Learn More", value: "LearnMore"),
                     //Detail Text
-                    Text = "Suthahar J is a Technical Lead and C# Corner MVP. He has extensive 10+ years of experience working on different technologies, mostly in Microsoft space. His focus areas are  Xamarin Cross Mobile Development ,UWP, SharePoint, Azure,Windows Mobile , Web , AI and Architecture. He writes about technology at his popular blog http://devenvexe.com",
+                    Text = "Suthahar J is a Technical Lead and C# Corner MVP. He has extensive 10+ years of experience working on different technologies, mostly in Microsoft space. His focus areas are  Xamarin Cross Mobile Development ,UWP, SharePoint, Azure,Windows Mobile , Web , AI and Architecture. He writes about technology at his popular blog https://stackoverflow.com/users/9663070/md-farid-uddin-kiron",
                     // list of  Large Image
-                    Images = new List<CardImage> { new CardImage("http://csharpcorner.mindcrackerinc.netdna-cdn.com/UploadFile/AuthorImage/jssuthahar20170821011237.jpg") },
+                    Images = new List<CardImage> { new CardImage("https://stackoverflow.com/users/9663070/md-farid-uddin-kiron") },
                     // list of buttons 
-                    Buttons = new List<CardAction> { new CardAction(ActionTypes.ImBack, "Learn More", value: "LearnMore"), new CardAction(ActionTypes.OpenUrl, "C# Corner", value: "http://www.c-sharpcorner.com/members/suthahar-j"), new CardAction(ActionTypes.OpenUrl, "MSDN", value: "https://social.msdn.microsoft.com/profile/j%20suthahar/") }
+                    Buttons = new List<CardAction> { new CardAction(ActionTypes.ImBack, "Learn More", value: "LearnMore"), new CardAction(ActionTypes.OpenUrl, "C# Corner", value: "https://stackoverflow.com/users/9663070/md-farid-uddin-kiron"), new CardAction(ActionTypes.OpenUrl, "MSDN", value: "https://stackoverflow.com/users/9663070/md-farid-uddin-kiron") }
                 };
 
                 // Create the attachment.
@@ -292,22 +292,20 @@ namespace Microsoft.BotBuilderSamples
             try
             {
                 var courseInfoCard = Activity.CreateMessageActivity();
-                var heroCard = new HeroCard
-                {
+                    {
                     // title of the card
-                    Title = "Suthahar Jegatheesan",
+                    Title = "Md Farid Uddin Kiron",
                     //subtitle of the card
                     Subtitle = "Microsoft certified solution developer",
                     // navigate to page , while tab on card
                     // Tap = new CardAction(ActionTypes.OpenUrl, "Learn More", value: "Learn More"),
                     Tap = new CardAction("", "Learn More", value: "LearnMore"),
                     //Detail Text
-                    Text = "Suthahar J is a Technical Lead and C# Corner MVP. He has extensive 10+ years of experience working on different technologies, mostly in Microsoft space. His focus areas are  Xamarin Cross Mobile Development ,UWP, SharePoint, Azure,Windows Mobile , Web , AI and Architecture. He writes about technology at his popular blog http://devenvexe.com",
+                    Text = "Suthahar J is a Technical Lead and C# Corner MVP. He has extensive 10+ years of experience working on different technologies, mostly in Microsoft space. His focus areas are  Xamarin Cross Mobile Development ,UWP, SharePoint, Azure,Windows Mobile , Web , AI and Architecture. He writes about technology at his popular blog https://stackoverflow.com/users/9663070/md-farid-uddin-kiron",
                     // list of  Large Image
-                    Images = new List<CardImage> { new CardImage("http://csharpcorner.mindcrackerinc.netdna-cdn.com/UploadFile/AuthorImage/jssuthahar20170821011237.jpg") },
+                    Images = new List<CardImage> { new CardImage("https://stackoverflow.com/users/9663070/md-farid-uddin-kiron") },
                     // list of buttons 
-                    Buttons = new List<CardAction> { new CardAction(ActionTypes.ImBack, "Learn More", value: "LearnMore"), new CardAction(ActionTypes.OpenUrl, "C# Corner", value: "http://www.c-sharpcorner.com/members/suthahar-j"), new CardAction(ActionTypes.OpenUrl, "MSDN", value: "https://social.msdn.microsoft.com/profile/j%20suthahar/"), new CardAction(ActionTypes.ImBack, "Close", value: "Close") }
-
+                    Buttons = new List<CardAction> { new CardAction(ActionTypes.ImBack, "Learn More", value: "LearnMore"), new CardAction(ActionTypes.OpenUrl, "C# Corner", value: "https://stackoverflow.com/users/9663070/md-farid-uddin-kiron"), new CardAction(ActionTypes.OpenUrl, "MSDN", value: "https://stackoverflow.com/users/9663070/md-farid-uddin-kiron") }
                 };
 
                 // Create the attachment.
