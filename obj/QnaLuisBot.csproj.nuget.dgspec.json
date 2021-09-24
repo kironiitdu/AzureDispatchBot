@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\KironDev\\CustomerDialog_Case_SDK\\QnaLuisBot.csproj": {}
+    "C:\\Users\\Administrator\\Downloads\\NewBot\\QnaLuisBot.csproj": {}
   },
   "projects": {
-    "C:\\KironDev\\CustomerDialog_Case_SDK\\QnaLuisBot.csproj": {
+    "C:\\Users\\Administrator\\Downloads\\NewBot\\QnaLuisBot.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\KironDev\\CustomerDialog_Case_SDK\\QnaLuisBot.csproj",
+        "projectUniqueName": "C:\\Users\\Administrator\\Downloads\\NewBot\\QnaLuisBot.csproj",
         "projectName": "QnaLuisBot",
-        "projectPath": "C:\\KironDev\\CustomerDialog_Case_SDK\\QnaLuisBot.csproj",
+        "projectPath": "C:\\Users\\Administrator\\Downloads\\NewBot\\QnaLuisBot.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "C:\\KironDev\\CustomerDialog_Case_SDK\\obj\\",
+        "outputPath": "C:\\Users\\Administrator\\Downloads\\NewBot\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

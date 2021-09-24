@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "uSOZ1OMFaM+GNYwYGKJ/MXSVI6hO3wJ8O8b6C8EZCwa7lQgRRs0PzuAoMKdlB21JDgyLrPGtvYv1NEvbnBEqhw==",
+  "dgSpecHash": "Vlyy3B9LKdqShw1TuABcm740C0v8gLuztCS77SVMo4ioDufPWmpbMRTWTgxGrzpFCGy0Rd6B5OHogXQD9lddJA==",
   "success": true,
-  "projectFilePath": "C:\\KironDev\\CustomerDialog_Case_SDK\\QnaLuisBot.csproj",
+  "projectFilePath": "C:\\Users\\Administrator\\Downloads\\NewBot\\QnaLuisBot.csproj",
   "expectedPackageFiles": [
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.aspnet.webapi.client\\5.2.6\\microsoft.aspnet.webapi.client.5.2.6.nupkg.sha512",
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder\\microsoft.aspnetcore\\2.1.1\\microsoft.aspnetcore.2.1.1.nupkg.sha512",
