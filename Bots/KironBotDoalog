@@ -1,0 +1,475 @@
+// Copyright (c) Microsoft Corporation. All rights reserved.
+// Licensed under the MIT License.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Azure.CognitiveServices.Language.LUIS.Runtime.Models;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Schema;
+using Microsoft.Extensions.Logging;
+using QnaLuisBot.Models;
+
+namespace Microsoft.BotBuilderSamples
+{
+    public class DispatchBot : ActivityHandler
+    {
+        private ILogger<DispatchBot> _logger;
+        private IBotServices _botServices;
+
+        public DispatchBot(IBotServices botServices, ILogger<DispatchBot> logger)
+        {
+            _logger = logger;
+            _botServices = botServices;
+        }
+
+        protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        {
+            //Checking User Input
+            dynamic checkUserInput = turnContext.Activity.Text;
+
+            dynamic userTypeValue = turnContext.Activity.Value;
+
+            await ProcessSampleQnAAsync(turnContext, cancellationToken);
+
+            switch (checkUserInput)
+            {
+                case "one":
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"Thank you very much for your \U0001F929 feedback"), cancellationToken);
+                    break;
+                case "two":
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"Thank you very much for your \U0001F929 \U0001F929 feedback"), cancellationToken);
+                    break;
+                case "three":
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"Thank you very much for your \U0001F929 \U0001F929 \U0001F929 \U0001F929 feedback"), cancellationToken);
+                    break;
+                case "four":
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"Thank you very much for your \U0001F929 \U0001F929 \U0001F929 \U0001F929 \U0001F929 feedback"), cancellationToken);
+                    break;
+                case "five":
+                    await turnContext.SendActivityAsync(MessageFactory.Text($"Thank you very much for your \U0001F929 \U0001F929 \U0001F929 \U0001F929 \U0001F929 \U0001F929 feedback"), cancellationToken);
+                    break;
+                case "SearchByIssueType":
+                    var replyFromUserCardSearchByIssueType = UserSelectionCard(checkUserInput);
+                    await turnContext.SendActivityAsync(replyFromUserCardSearchByIssueType);
+                    break;
+                case "SearchByProductCategory":
+                    var replyFromUserCardSearchByProductCategort = UserSelectionCard(checkUserInput);
+                    await turnContext.SendActivityAsync(replyFromUserCardSearchByProductCategort);
+                    break;
+                default:// If no answer founded always call QNA maker again.
+                    var endConversation = EndOfConversationCard();
+                    await turnContext.SendActivityAsync(endConversation);
+                    break;
+
+            }
+
+            //// First, we use the dispatch model to determine which cognitive service (LUIS or QnA) to use.
+            //var recognizerResult = await _botServices.Dispatch.RecognizeAsync(turnContext, cancellationToken);
+
+            //// Top intent tell us which cognitive service to use.
+            //var topIntent = recognizerResult.GetTopScoringIntent();
+
+            //// Next, we call the dispatcher with the top intent.
+            //await DispatchToTopIntentAsync(turnContext, topIntent.intent, recognizerResult, cancellationToken);
+        }
+
+        protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
+        {
+            // const string WelcomeText = "Type a greeting, or a question about the weather to get started.";
+
+            foreach (var member in membersAdded)
+            {
+                if (member.Id != turnContext.Activity.Recipient.Id)
+                {
+                    DateTime dateTime = DateTime.Now;
+                    DateTime utcTime = dateTime.ToUniversalTime();
+                    TimeZoneInfo cstZone = TimeZoneInfo.FindSystemTimeZoneById("China Standard Time");
+
+                    DateTime yourLocalTime = TimeZoneInfo.ConvertTimeFromUtc(utcTime, cstZone);
+                    var hour = yourLocalTime.Hour;
+
+                    switch (hour)
+                    {
+                        case int time when time <= 12:
+                            await turnContext.SendActivityAsync(MessageFactory.Text($"Hello , good morning"), cancellationToken);
+                            break;
+                        case int time when (time >= 12 && time <= 17):
+                            var productProactivePromptCard = ProductAndCategoryPromptCard();
+                            await turnContext.SendActivityAsync(productProactivePromptCard);
+                            await turnContext.SendActivityAsync(MessageFactory.Text($"Hello , good afternoon"), cancellationToken);
+                            break;
+                        case int time when time > 17:
+                            var productProactivePromptCardEvening = ProductAndCategoryPromptCard();
+                            await turnContext.SendActivityAsync(productProactivePromptCardEvening);
+                            // await turnContext.SendActivityAsync(MessageFactory.Text($"Hello , good evening"), cancellationToken);
+                            break;
+                        default:
+                            await turnContext.SendActivityAsync(MessageFactory.Text($"Hello and welcome!"), cancellationToken);
+                            break;
+                    }
+
+                }
+            }
+        }
+
+        private async Task DispatchToTopIntentAsync(ITurnContext<IMessageActivity> turnContext, string intent, RecognizerResult recognizerResult, CancellationToken cancellationToken)
+        {
+            //Check top intent score for better rediction
+            var result = recognizerResult.Properties["luisResult"] as LuisResult;
+            var score = result.Intents[0].Score;
+            if (score < 0.50)
+            {
+                await ProcessSampleQnAAsync(turnContext, cancellationToken);
+            }
+            else
+            {
+                switch (intent)
+                {
+                    case "checktime":
+                        await GetTimeInfo(turnContext, cancellationToken);
+                        break;
+                    case "weather":
+                        await GetWeatherUpdateFromAPI(turnContext, cancellationToken);
+                        // await ProcessWeatherAsync(turnContext, recognizerResult.Properties["luisResult"] as LuisResult, cancellationToken);
+                        break;
+                    case "searchname":
+                        await GetEmployeeById(turnContext, cancellationToken);
+                        break;
+                    case "getsalary":
+                        await GetEmployeeById(turnContext, cancellationToken);
+                        break;
+                    case "None":
+                        //Call Qna Maker Here 
+                        await ProcessSampleQnAAsync(turnContext, cancellationToken);
+                        break;
+                    default:// If no answer founded always call QNA maker again.
+                        await ProcessSampleQnAAsync(turnContext, cancellationToken);
+                        break;
+
+                }
+            }
+
+        }
+
+        private async Task ProcessHomeAutomationAsync(ITurnContext<IMessageActivity> turnContext, LuisResult luisResult, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("ProcessHomeAutomationAsync");
+
+            // Retrieve LUIS result for Process Automation.
+            var result = luisResult.ConnectedServiceResult;
+            var topIntent = result.TopScoringIntent.Intent;
+
+            await turnContext.SendActivityAsync(MessageFactory.Text($"HomeAutomation top intent is {topIntent}."), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Text($"HomeAutomation intents detected:\n\n{string.Join("\n\n", result.Intents.Select(i => i.Intent))}"), cancellationToken);
+            if (luisResult.Entities.Count > 0)
+            {
+                await turnContext.SendActivityAsync(MessageFactory.Text($"HomeAutomation entities were found in the message:\n\n{string.Join("\n\n", result.Entities.Select(i => i.Entity))}"), cancellationToken);
+            }
+        }
+
+        private async Task ProcessWeatherAsync(ITurnContext<IMessageActivity> turnContext, LuisResult luisResult, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("ProcessWeatherAsync");
+
+            // Retrieve LUIS results for Weather.
+            var topIntent = luisResult.Intents[0].Intent;
+            var score = luisResult.Intents[0].Score;
+            var entity = luisResult.Entities[0].Entity;
+            await turnContext.SendActivityAsync(MessageFactory.Text($"Which city's weather you are looking for?"), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Text($"ProcessWeather top intent is: {topIntent + " & score is: " + score}."), cancellationToken);
+            await turnContext.SendActivityAsync(MessageFactory.Text($"ProcessWeather Intents detected::\n\n{string.Join("\n\n", entity)}"), cancellationToken);
+            if (luisResult.Entities.Count > 0)
+            {
+                await turnContext.SendActivityAsync(MessageFactory.Text($"ProcessWeather entities were found in the message:\n\n{string.Join("\n\n", entity)}"), cancellationToken);
+            }
+        }
+
+        private async Task ProcessSampleQnAAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("ProcessSampleQnAAsync");
+
+
+            try
+            {
+                var results = await _botServices.SampleQnA.GetAnswersAsync(turnContext);
+                if (results.Any())
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text(results.First().Answer), cancellationToken);
+                }
+                else
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text("Sorry, could not find an answer in the Q and A system."), cancellationToken);
+                }
+            }
+            catch (System.Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+        private async Task GetWeatherUpdateFromAPI(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Calling Weather Update API");
+
+
+            try
+            {
+                var cityName = "Riyadh";
+                //CustomWeatherClass
+                WeatherResponseClass objResponse = new WeatherResponseClass();
+                objResponse = await _botServices.GetWeatherUpdate(cityName);
+                if (objResponse != null)
+                {
+                    var weatherInfoCard = CardWatherInfo(objResponse);
+                    await turnContext.SendActivityAsync(weatherInfoCard);
+                }
+                else
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text("Sorry, could not find an answer in the Q and A system."), cancellationToken);
+                }
+            }
+            catch (System.Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+        private async Task GetEmployeeById(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Calling Employee API");
+
+
+            try
+            {
+
+                Random rnd = new Random();
+                var newId = rnd.Next(1, 10);
+                int employeeId = newId;
+                //Bind Response To Employee Class
+                EmployeeAPIResponse objResponse = new EmployeeAPIResponse();
+                objResponse = await _botServices.GetEmployee(employeeId);
+                if (objResponse != null)
+                {
+                    var employeeCard = CardEmployeeInfo(objResponse);
+                    await turnContext.SendActivityAsync(employeeCard);
+
+                }
+                else
+                {
+                    await turnContext.SendActivityAsync(MessageFactory.Text("Sorry, could not find an answer in the Q and A system."), cancellationToken);
+                }
+            }
+            catch (System.Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+        private async Task GetTimeInfo(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
+        {
+            _logger.LogInformation("Calling Time Method");
+
+
+            try
+            {
+                var timeCard = CardCurrentTimeInfo();
+                await turnContext.SendActivityAsync(timeCard);
+            }
+            catch (System.Exception ex)
+            {
+
+                throw;
+            }
+
+        }
+
+        public IMessageActivity EndOfConversationCard()
+        {
+            try
+            {
+                //Break in Segment
+                var timeInfoCard = Activity.CreateMessageActivity();
+                var thanks = "Thank you very much for your interaction";
+                var rate = "You could rate our service...";
+                //Bind to Card
+                var heroCard = new HeroCard
+                {
+                    // Title = "Thank you very much for your interaction, you could rate me...",
+                    Text = string.Format("**{0}** " + Environment.NewLine + "**{1}**", thanks, rate),
+                    Images = new List<CardImage> { new CardImage("") },
+                    Buttons = new List<CardAction> {
+                        new CardAction(ActionTypes.ImBack, "\U0001F929", value: "one") ,
+                        new CardAction(ActionTypes.ImBack, "\U0001F929 \U0001F929 ", value: "two"),
+                        new CardAction(ActionTypes.ImBack, "\U0001F929 \U0001F929 \U0001F929", value: "three"),
+                        new CardAction(ActionTypes.ImBack, "\U0001F929 \U0001F929 \U0001F929 \U0001F929 \U0001F929", value: "four"),
+                        new CardAction(ActionTypes.ImBack, "\U0001F929 \U0001F929 \U0001F929 \U0001F929 \U0001F929 \U0001F929", value: "five"),
+                    },
+                };
+
+                // Create the attachment.
+                var attachment = heroCard.ToAttachment();
+
+                timeInfoCard.Attachments.Add(attachment);
+                timeInfoCard.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                return timeInfoCard;
+            }
+            catch (Exception ex)
+            {
+                throw new NotImplementedException(ex.Message, ex.InnerException);
+            }
+
+        }
+        public IMessageActivity ProductAndCategoryPromptCard()
+        {
+            try
+            {
+                //Break in Segment
+                var timeInfoCard = Activity.CreateMessageActivity();
+                //Bind to Card
+                var heroCard = new HeroCard
+                {
+                    Title = "Try to search using the type of issue, or type of device",
+                    // Text = string.Format("Time: **{0}** " + Environment.NewLine + "Day: **{1}**" + Environment.NewLine + "Date: **{2}**", time, day, date),
+                    Images = new List<CardImage> { new CardImage("") },
+                    Buttons = new List<CardAction> {
+                        new CardAction(ActionTypes.ImBack, "Search By Issue Type", value: "SearchByIssueType") ,
+                        new CardAction(ActionTypes.ImBack, "Search By Product Category", value: "SearchByProductCategory")
+                    },
+                };
+
+                // Create the attachment.
+                var attachment = heroCard.ToAttachment();
+
+                timeInfoCard.Attachments.Add(attachment);
+                timeInfoCard.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                return timeInfoCard;
+            }
+            catch (Exception ex)
+            {
+                throw new NotImplementedException(ex.Message, ex.InnerException);
+            }
+
+        }
+
+        public IMessageActivity UserSelectionCard(string customerSelecteddValue)
+        {
+            try
+            {
+                //Break Segment
+
+                var timeInfoCard = Activity.CreateMessageActivity();
+                //Bind to Card
+                var heroCard = new HeroCard
+                {
+                    Title = "**"+ customerSelecteddValue + " Card**",
+                    Text = string.Format("You have selected: **{0}** ", customerSelecteddValue),
+                    Images = new List<CardImage> { new CardImage("") },
+                    Buttons = new List<CardAction> { 
+                        new CardAction(ActionTypes.ImBack, "Thank you very much", value: "Okay") 
+                    },
+                };
+
+                // Create the attachment.
+                var attachment = heroCard.ToAttachment();
+
+                timeInfoCard.Attachments.Add(attachment);
+                timeInfoCard.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                return timeInfoCard;
+            }
+            catch (Exception ex)
+            {
+                throw new NotImplementedException(ex.Message, ex.InnerException);
+            }
+
+        }
+        public IMessageActivity CardCurrentTimeInfo()
+        {
+            try
+            {
+                //Break Time in Segment
+                var time = DateTime.Now.ToString("h:mm:ss tt");
+                var day = System.DateTime.Now.DayOfWeek.ToString();
+                var date = DateTime.Now.ToString("yyyy-MM-dd");
+                var timeInfoCard = Activity.CreateMessageActivity();
+                //Bind to Card
+                var heroCard = new HeroCard
+                {
+                    Title = "**Time Information Card**",
+                    Text = string.Format("Time: **{0}** " + Environment.NewLine + "Day: **{1}**" + Environment.NewLine + "Date: **{2}**", time, day, date),
+                    Images = new List<CardImage> { new CardImage("") },
+                    Buttons = new List<CardAction> { new CardAction(ActionTypes.ImBack, "Okay", value: "Okay") },
+                };
+
+                // Create the attachment.
+                var attachment = heroCard.ToAttachment();
+
+                timeInfoCard.Attachments.Add(attachment);
+                timeInfoCard.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                return timeInfoCard;
+            }
+            catch (Exception ex)
+            {
+                throw new NotImplementedException(ex.Message, ex.InnerException);
+            }
+
+        }
+        public IMessageActivity CardEmployeeInfo(EmployeeAPIResponse employee)
+        {
+            try
+            {
+                var employeeInfoCard = Activity.CreateMessageActivity();
+                var heroCard = new HeroCard
+                {
+                    Title = "**Employee Information Card**",
+                    Text = string.Format("Employee Name: {0} " + Environment.NewLine + "Employee Salary: {1}", employee.data.employee_name, employee.data.employee_salary),
+                    Images = new List<CardImage> { new CardImage("") },
+                    Buttons = new List<CardAction> { new CardAction(ActionTypes.ImBack, "Okay", value: "Okay") },
+                };
+
+                // Create the attachment.
+                var attachment = heroCard.ToAttachment();
+
+                employeeInfoCard.Attachments.Add(attachment);
+                employeeInfoCard.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                return employeeInfoCard;
+            }
+            catch (Exception ex)
+            {
+                throw new NotImplementedException(ex.Message, ex.InnerException);
+            }
+
+        }
+        public IMessageActivity CardWatherInfo(WeatherResponseClass weatherResponse)
+        {
+            try
+            {
+                var weatherCard = Activity.CreateMessageActivity();
+                var heroCard = new HeroCard
+                {
+                    Title = "**Weather Information Card**",
+                    Text = string.Format("Temperature: **{0} C** " + Environment.NewLine + "Weather Condition: {1}" + Environment.NewLine + "City: {2}" + Environment.NewLine + "Country: {3}", weatherResponse.temperature, weatherResponse.weatherCondition, weatherResponse.city, weatherResponse.country),
+                    Images = new List<CardImage> { new CardImage("") },
+                    Buttons = new List<CardAction> { new CardAction(ActionTypes.ImBack, "Okay", value: "Okay") },
+                };
+
+                // Create the attachment.
+                var attachment = heroCard.ToAttachment();
+
+                weatherCard.Attachments.Add(attachment);
+                weatherCard.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+                return weatherCard;
+            }
+            catch (Exception ex)
+            {
+                throw new NotImplementedException(ex.Message, ex.InnerException);
+            }
+
+        }
+    }
+}
