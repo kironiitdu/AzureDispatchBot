@@ -26,7 +26,7 @@ namespace Microsoft.BotBuilderSamples
             services.AddSingleton<IBotServices, BotServices>();
 
             // Create the bot as a transient.
-            services.AddTransient<IBot, DispatchBot>();
+            services.AddTransient<IBot, KironBotDialog>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
